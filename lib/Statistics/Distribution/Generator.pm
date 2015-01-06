@@ -14,14 +14,9 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-sub gaussian ($$);
-sub uniform ($$);
-sub logistic ();
-sub supplied ($);
-sub gamma ($$);
-sub exponential ($);
+$VERSION = '0.006';
 
-$VERSION = '0.005';
+sub logistic ();
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
@@ -56,14 +51,14 @@ sub _render {
     }
 }
 
-sub gaussian ($$) {
+sub gaussian {
     my ($mean, $sigma) = @_;
     $mean //= 0;
     $sigma //= 1;
     return bless { mean => $mean, sigma => $sigma }, 'Statistics::Distribution::Generator::gaussian';
 }
 
-sub uniform ($$) {
+sub uniform {
     my ($min, $max) = @_;
     $min //= 0;
     $max //= 1;
@@ -74,7 +69,7 @@ sub logistic () {
     return bless { }, 'Statistics::Distribution::Generator::logistic';
 }
 
-sub supplied ($) {
+sub supplied {
     my ($iv) = @_;
     my $rv;
     if (ref $iv eq 'CODE') {
@@ -86,7 +81,7 @@ sub supplied ($) {
     return bless $rv, 'Statistics::Distribution::Generator::supplied';
 }
 
-sub gamma ($$) {
+sub gamma {
     my ($order, $scale) = map { $_ // 1 } @_;
     return bless {
         order => $order,
@@ -95,7 +90,7 @@ sub gamma ($$) {
     }, 'Statistics::Distribution::Generator::gamma';
 }
 
-sub exponential ($) {
+sub exponential {
     my ($lambda) = map { $_ // 1 } @_;
     return bless { lambda => $lambda }, 'Statistics::Distribution::Generator::exponential';
 }
@@ -236,16 +231,16 @@ functions
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =head1 SYNOPSIS
 
     use Statistics::Distribution::Generator qw( :all );
-    my $g = gaussian 3, 1;
+    my $g = gaussian(3, 1);
     say $g; # something almost certainly between -3 and 9, but probably about 2 .. 4-ish
-    my $cloud = (gaussian 0, 1 x gaussian 0, 1 x gaussian 0, 1);
+    my $cloud = gaussian(0, 1) x gaussian(0, 1) x gaussian(0, 1);
     say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 2, +/- 2, +/- 2)
-    my $combo = (gaussian 100, 15 | uniform 0, 200); # one answer with an equal chance of being picked from either distribution
+    my $combo = gaussian(100, 15) | uniform(0, 200); # one answer with an equal chance of being picked from either distribution
 
 =head1 DESCRIPTION
 
@@ -273,21 +268,21 @@ precendence than others).
 I<The first thing to note> is that B<x> and B<|> have their I<normal> Perl
 precendence and associativity. This means that parens are B<strongly> advised
 to make your code more readable. This may be fixed in later versions of this
-module, by using the L<B::Op> module, but that would still not make parens a
-bad idea.
+module, by messing about with the L<B> modules, but that would still not make
+parens a bad idea.
 
 I<The second thing to note> is that B<x> and B<|> may be "nested" arbitrarily
 many levels deep (within the usual memory & CPU limits of your computer, of
 course). You could, for instance, compose multiple "vectors" of different sizes
 using B<x> to form each one, and select between them at random with X<|>, e.g.
 
-    my $forwards = (gaussian 0, 0.5, x gaussian 3, 1 x gaussian 0, 0.5);
-    my $backwards = (gaussian 0, 0.5, x gaussian -3, 1 x gaussian 0, 0.5);
-    my $left = (gaussian -3, 1 x gaussian 0, 0.5, x gaussian 0, 0.5);
-    my $right = (gaussian 3, 1 x gaussian 0, 0.5, x gaussian 0, 0.5);
-    my $up = (gaussian 0, 0.5, x gaussian 0, 0.5 x gaussian 3, 1);
-    my $down = (gaussian 0, 0.5, x gaussian 0, 0.5 x gaussian -3, 1);
-    my $direction = ($forwards | $backwards | $left | $right | $up | $down);
+    my $forwards = gaussian(0, 0.5) x gaussian(3, 1) x gaussian(0, 0.5);
+    my $backwards = gaussian(0, 0.5) x gaussian(-3, 1) x gaussian(0, 0.5);
+    my $left = gaussian(-3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
+    my $right = gaussian(3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
+    my $up = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(3, 1);
+    my $down = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(-3, 1);
+    my $direction = $forwards | $backwards | $left | $right | $up | $down;
     $robot->move(@$direction);
 
 You are strongly encouraged to seek further elucidation at Wikipedia or any
@@ -297,7 +292,7 @@ other available reference site / material.
 
 =over
 
-=item gaussian MEAN, SIGMA
+=item gaussian(MEAN, SIGMA)
 
 Gaussian Normal Distribution. This is the classic "bell curve" shape. Numbers
 close to the MEAN are more likely to be selected, and the value of SIGMA is
@@ -311,7 +306,7 @@ approximately a 1 in a million long shot.
 
 =over
 
-=item uniform MIN, MAX
+=item uniform(MIN, MAX)
 
 A Uniform Distribution, with equal chance of any N where MIN Z<><= N Z<>< MAX.
 This is equivalent to Perl's standard C<rand()> function, except you supply the
@@ -333,9 +328,9 @@ I<hyperbolic secant squared> distribution.
 
 =over
 
-=item supplied VALUE
+=item supplied(VALUE)
 
-=item supplied CALLBACK
+=item supplied(CALLBACK)
 
 Allows the caller to supply either a constant VALUE which will always be
 returned as is, or a coderef CALLBACK that may use any algorithm you like to
@@ -348,7 +343,7 @@ on your own in how to interpret that, and you are probably doing it wrongly.
 
 =over
 
-=item gamma ORDER, SCALE
+=item gamma(ORDER, SCALE)
 
 The Gamma Distribution function is a generalization of the chi-squared and
 exponential distributions, and may be given by
@@ -366,7 +361,7 @@ exponentially-distributed random variables, each of which has a mean of I<theta>
 
 =over
 
-=item exponential LAMBDA
+=item exponential(LAMBDA)
 
 The Exponential Distribution function is often useful when modeling /
 simulating the time between events in certain types of system. It is also used
@@ -429,9 +424,13 @@ The implementation of the Gamma Distribution is by Nigel Wetters Gourlay.
 
 Almost no error checking is done. Garbage in I<will> result in garbage out.
 
+This is B<ALPHA> quality software. Any aspect of it, including the API and core functionality, is likely to change at any time.
+
 =head1 TODO
 
 Build in more probability density functions.
+
+Tests. Lots of very clever tests.
 
 =head1 LICENSE
 
