@@ -20,7 +20,7 @@ sub logistic ();
 sub supplied ($);
 sub gamma ($$);
 
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
@@ -224,15 +224,15 @@ Statistics::Distribution::Generator - A way to compose complicated probability f
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
     use Statistics::Distribution::Generator qw( :all );
     my $g = gaussian 3, 1;
-    say $g; # something probably between -3 and 9, but probably about 2 .. 4-ish
+    say $g; # something almost certainly between -3 and 9, but probably about 2 .. 4-ish
     my $cloud = (gaussian 0, 1 x gaussian 0, 1 x gaussian 0, 1);
-    say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 3, +/- 3, +/- 3)
+    say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 2, +/- 2, +/- 2)
     my $combo = (gaussian 100, 15 | uniform 0, 200); # one answer with an equal chance of being picked from either distribution
 
 =head1 DESCRIPTION
