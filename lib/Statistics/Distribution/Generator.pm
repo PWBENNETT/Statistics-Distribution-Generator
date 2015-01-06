@@ -12,6 +12,7 @@ use overload (
 
 use List::AllUtils qw( reduce );
 use Exporter qw( import );
+use vars qw( $VERSION );
 
 sub gaussian ($$);
 sub uniform ($$);
@@ -19,7 +20,7 @@ sub logistic ();
 sub supplied ($);
 sub gamma ($$);
 
-our $VERSION = '0.001';
+$VERSION = '0.001';
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
@@ -36,7 +37,7 @@ sub _render {
         my $alt;
         for $alt (@{$self->{ alts }}) {
             if ($n >= ($alt->{ weight } // 1)) {
-                $n -= $alt_weight;
+                $n -= $alt->{ weight };
                 last if $n <= 0;
             }
         }
@@ -95,7 +96,7 @@ sub gamma ($$) {
 
 sub _rand_nonzero {
     my $rv;
-    1 while (!$rv = rand);
+    1 while (!($rv = rand));
     return $rv;
 }
 

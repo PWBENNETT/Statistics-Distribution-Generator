@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Statistics/Distribution/Generator.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
