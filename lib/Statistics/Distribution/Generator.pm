@@ -21,7 +21,7 @@ sub supplied ($);
 sub gamma ($$);
 sub exponential ($);
 
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
@@ -197,7 +197,7 @@ sub Statistics::Distribution::Generator::uniform::_render {
 
 sub Statistics::Distribution::Generator::logistic::_render {
     my $self = shift;
-    return 1 / log rand;
+    return -log((1 / _rand_nonzero()) - 1);
 }
 
 sub Statistics::Distribution::Generator::supplied::_render {
@@ -222,7 +222,7 @@ sub Statistics::Distribution::Generator::gamma::_render {
 
 sub Statistics::Distribution::Generator::exponential::_render {
     my $self = shift;
-    my $rv = $self->{ lambda } * exp(-$self->{ lambda } * rand);
+    my $rv = -log(rand) / $self->{ lambda };
 }
 
 1;
@@ -236,7 +236,7 @@ functions
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 
