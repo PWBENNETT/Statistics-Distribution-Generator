@@ -20,7 +20,7 @@ sub logistic ();
 sub supplied ($);
 sub gamma ($$);
 
-$VERSION = '0.001';
+$VERSION = '0.002';
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
@@ -253,7 +253,7 @@ Gaussian Normal Distribution
 
 =item uniform MIN, MAX
 
-A uniform distribution, with equal chance of any n where MIN Z<<>= n Z<<> MAX
+A uniform distribution, with equal chance of any n where MIN Z<><= n Z<>< MAX
 
 =back
 
@@ -274,6 +274,8 @@ Standard Logistic Distribution
 Allows the caller to supply either a constant VALUE which will always be returned, or a coderef CALLBACK that may use any algorithm you like to generate a random number
 
 =back
+
+=over
 
 =item gamma ORDER, SCALE
 
@@ -310,7 +312,7 @@ Allows you to pick a single (optionally weighted) generator from some set of gen
 
 =head1 AUTHOR
 
-The main body of this work is by Paul W Bennett E<paul.w.bennett@gmail.com>
+The main body of this work is by Paul W Bennett
 
 The idea of composing probabilities together comes from a paper by B<TODO: CITE THE PAPER HERE>
 
