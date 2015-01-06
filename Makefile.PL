@@ -8,12 +8,11 @@ WriteMakefile(
     VERSION_FROM        => 'lib/Statistics/Distribution/Generator.pm',
     ABSTRACT_FROM       => 'lib/Statistics/Distribution/Generator.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
+      ? ('LICENSE' => 'perl')
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
         'List::AllUtils' => '0',
-        'Text::Table' => '0',
         'Test::More'   => '0',
         'Exporter' => '0',
     },

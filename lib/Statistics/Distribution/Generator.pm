@@ -19,10 +19,11 @@ sub uniform ($$);
 sub logistic ();
 sub supplied ($);
 sub gamma ($$);
+sub exponential ($);
 
-$VERSION = '0.003';
+$VERSION = '0.004';
 
-our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma );
+our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
 our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
 
 our $pi = 3.14159265358979323846264338327950288419716939937510;
@@ -92,6 +93,11 @@ sub gamma ($$) {
         scale => $scale,
         norder => int($order),
     }, 'Statistics::Distribution::Generator::gamma';
+}
+
+sub exponential ($) {
+    my ($lambda) = map { $_ // 1 } @_;
+    return bless { lambda => $lambda }, 'Statistics::Distribution::Generator::exponential';
 }
 
 sub _rand_nonzero {
@@ -214,17 +220,23 @@ sub Statistics::Distribution::Generator::gamma::_render {
     return $rv;
 }
 
+sub Statistics::Distribution::Generator::exponential::_render {
+    my $self = shift;
+    my $rv = $self->{ lambda } * exp(-$self->{ lambda } * rand);
+}
+
 1;
 
 __END__
 
 =head1 NAME
 
-Statistics::Distribution::Generator - A way to compose complicated probability functions
+Statistics::Distribution::Generator - A way to compose complicated probability
+functions
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -237,7 +249,49 @@ Version 0.003
 
 =head1 DESCRIPTION
 
-This module allows you to bake together multiple "simple" probability distributions into a more complex random number generator.
+This module allows you to bake together multiple "simple" probability
+distributions into a more complex random number generator. It does this lazily:
+when you call one of the PDF generating functions, it makes an object, the
+value of which is not calculated at creation time, but rather re-calculated
+each and every time you try to read the value of the object. If you are
+familiar with Functional Programming, you can think of the exported functions
+returning functors with their "setup" values curried into them.
+
+To this end, two of Perl's operators (B<x> and B<|>) have been overloaded with
+special semantics.
+
+The B<x> operator composes multiple distributions at once, giving an ARRAYREF
+of "answers" when interrogated, which is designed primarily to be interpreted
+as a vector in N-dimensional space (where N is the number of elements in the
+ARRAYREF).
+
+The B<|> operator composes multiple distributions into a single value, giving
+a SCALAR "answer" when interrogated. It does this by picking at random between
+the composed distributions (which may be weighted to give some higher
+precendence than others).
+
+I<The first thing to note> is that B<x> and B<|> have their I<normal> Perl
+precendence and associativity. This means that parens are B<strongly> advised
+to make your code more readable. This may be fixed in later versions of this
+module, by using the L<B::Op> module, but that would still not make parens a
+bad idea.
+
+I<The second thing to note> is that B<x> and B<|> may be "nested" arbitrarily
+many levels deep (within the usual memory & CPU limits of your computer, of
+course). You could, for instance, compose multiple "vectors" of different sizes
+using B<x> to form each one, and select between them at random with X<|>, e.g.
+
+    my $forwards = (gaussian 0, 0.5, x gaussian 3, 1 x gaussian 0, 0.5);
+    my $backwards = (gaussian 0, 0.5, x gaussian -3, 1 x gaussian 0, 0.5);
+    my $left = (gaussian -3, 1 x gaussian 0, 0.5, x gaussian 0, 0.5);
+    my $right = (gaussian 3, 1 x gaussian 0, 0.5, x gaussian 0, 0.5);
+    my $up = (gaussian 0, 0.5, x gaussian 0, 0.5 x gaussian 3, 1);
+    my $down = (gaussian 0, 0.5, x gaussian 0, 0.5 x gaussian -3, 1);
+    my $direction = ($forwards | $backwards | $left | $right | $up | $down);
+    $robot->move(@$direction);
+
+You are strongly encouraged to seek further elucidation at Wikipedia or any
+other available reference site / material.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -245,7 +299,13 @@ This module allows you to bake together multiple "simple" probability distributi
 
 =item gaussian MEAN, SIGMA
 
-Gaussian Normal Distribution
+Gaussian Normal Distribution. This is the classic "bell curve" shape. Numbers
+close to the MEAN are more likely to be selected, and the value of SIGMA is
+used to determine how unlikely more-distant values are. For instance, about 2/3
+of the "answers" will be in the range (MEAN - SIGMA) Z<><= N Z<><= (MEAN +
+SIGMA), and around 99.5% of the "answers" will be in the range (MEAN - 3 * SIGMA)
+Z<><= N Z<><= (MEAN + 3 * SIGMA). "Answers" as far away as 6 * SIGMA are
+approximately a 1 in a million long shot.
 
 =back
 
@@ -253,7 +313,11 @@ Gaussian Normal Distribution
 
 =item uniform MIN, MAX
 
-A uniform distribution, with equal chance of any n where MIN Z<><= n Z<>< MAX
+A Uniform Distribution, with equal chance of any N where MIN Z<><= N Z<>< MAX.
+This is equivalent to Perl's standard C<rand()> function, except you supply the
+MIN and MAX instead of allowing them to fall at 0 and 1 respectively. Any value
+within the range I<should> be equally likely to be chosen, provided you have a
+"good" random number generator in your computer.
 
 =back
 
@@ -261,7 +325,9 @@ A uniform distribution, with equal chance of any n where MIN Z<><= n Z<>< MAX
 
 =item logistic
 
-Standard Logistic Distribution
+The Logistic Distribution is used descriptively in a wide variety of fields
+from market research to the design of neural networks, and is also known as the
+I<hyperbolic secant squared> distribution.
 
 =back
 
@@ -271,7 +337,12 @@ Standard Logistic Distribution
 
 =item supplied CALLBACK
 
-Allows the caller to supply either a constant VALUE which will always be returned, or a coderef CALLBACK that may use any algorithm you like to generate a random number
+Allows the caller to supply either a constant VALUE which will always be
+returned as is, or a coderef CALLBACK that may use any algorithm you like to
+generate a suitable random number. For now, B<this is the main plugin methodology>
+for this module. The supplied CALLBACK is given no arguments, and B<SHOULD>
+return a numeric answer. If it returns something non-numeric, you are entirely
+on your own in how to interpret that, and you are probably doing it wrongly.
 
 =back
 
@@ -279,12 +350,27 @@ Allows the caller to supply either a constant VALUE which will always be returne
 
 =item gamma ORDER, SCALE
 
-Gamma Distribution
-
-The distribution function is
+The Gamma Distribution function is a generalization of the chi-squared and
+exponential distributions, and may be given by
 
     p(x) dx = {1 \over \Gamma(a) b^a} x^{a-1} e^{-x/b} dx
     for x > 0.
+
+The ORDER argument corresponds to what is also known as the "shape parameter"
+I<k>, and the SCALE argument corresponds to the "scale parameter" I<theta>.
+
+If I<k> is an integer, the Gamma Distribution is equivalent to the sum of I<k>
+exponentially-distributed random variables, each of which has a mean of I<theta>.
+
+=back
+
+=over
+
+=item exponential LAMBDA
+
+The Exponential Distribution function is often useful when modeling /
+simulating the time between events in certain types of system. It is also used
+in reliability theory and the Barometric formula in physics.
 
 =back
 
@@ -304,9 +390,28 @@ Allows you to compose multi-dimensional random vectors.
 
 =item |
 
-Allows you to pick a single (optionally weighted) generator from some set of generators.
+Allows you to pick a single (optionally weighted) generator from some set of
+generators.
 
     $cointoss = supplied 0 | supplied 1; # fair 50:50 result of either 0 or 1
+
+=back
+
+=head1 OBJECT ATTRIBUTES
+
+=over
+
+=item $distribution->{ weight }
+
+This setting may be used to make B<|>-based selections favor one or more
+outcomes more (or less) than the remaining outcomes. The default weight for all
+outcomes is 1. Weights are relative, not absolute, so may be scaled however you
+need.
+
+    $foo = exponential 1.5;
+    $bar = gaussian 20, 1.25;
+    $foo->{ weight } = 6;
+    $quux = $foo | $bar; # 6:1 chance of picking $foo instead of $bar
 
 =back
 
@@ -314,7 +419,9 @@ Allows you to pick a single (optionally weighted) generator from some set of gen
 
 The main body of this work is by Paul W Bennett
 
-The idea of composing probabilities together comes from a paper by B<TODO: CITE THE PAPER HERE>
+The idea of composing probabilities together is inspired by work done by Sooraj
+Bhat, Ashish Agarwal, Richard Vuduc, and Alexander Gray at Georgia Tech and
+NYU, published around the end of 2011.
 
 The implementation of the Gamma Distribution is by Nigel Wetters Gourlay.
 

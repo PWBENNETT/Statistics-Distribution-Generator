@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Tabluate
 
+0.004   2015-01-06
+        Improve documentation with more examples and discussion
+
 0.003   2015-01-06
         Fixed some more POD errors
 
