@@ -154,7 +154,7 @@ sub _gamma_frac {
 sub _add_alternative {
     my ($lhs, $rhs, $swapped) = @_;
     ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
-    $rhs = supplied $rhs unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
+    $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
     my $self
         = ref($lhs) eq 'Statistics::Distribution::Generator'
         ? { %$lhs }
@@ -168,7 +168,7 @@ sub _add_alternative {
 sub _add_dimension {
     my ($lhs, $rhs, $swapped) = @_;
     ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
-    $rhs = supplied $rhs unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
+    $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
     my $self
         = ref($lhs) eq 'Statistics::Distribution::Generator'
         ? { %$lhs }
