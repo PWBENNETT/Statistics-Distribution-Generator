@@ -14,7 +14,7 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.006';
+$VERSION = '0.007';
 
 sub logistic ();
 
@@ -30,14 +30,15 @@ sub _render {
     if ($self->{ alts }) {
         my $accum = reduce { $a + $b } map { $_->{ weight } // 1 } @{$self->{ alts }};
         my $n = rand() * $accum;
-        my $alt;
-        for $alt (@{$self->{ alts }}) {
-            if ($n >= ($alt->{ weight } // 1)) {
-                $n -= $alt->{ weight };
-                last if $n <= 0;
+        my $answer;
+        for my $alt (@{$self->{ alts }}) {
+            $n -= ($alt->{ weight } // 1);
+            if ($n <= 0) {
+                $answer = $alt->_render;
+                last;
             }
         }
-        return $alt->_render;
+        return $answer;
     }
     elsif ($self->{ dims }) {
         my @rv;
@@ -321,7 +322,7 @@ functions
 
 =head1 VERSION
 
-Version 0.006
+Version 0.007
 
 =head1 SYNOPSIS
 
