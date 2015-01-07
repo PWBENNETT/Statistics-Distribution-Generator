@@ -7,7 +7,7 @@ use overload (
     '""' => '_render',
     '|' => '_add_alternative',
     'x' => '_add_dimension',
-    fallback => 0,
+    fallback => 1,
 );
 
 use List::AllUtils qw( reduce );
@@ -178,29 +178,104 @@ sub _add_dimension {
     return $self;
 }
 
-sub Statistics::Distribution::Generator::gaussian::_render {
+1;
+
+package Statistics::Distribution::Generator::gaussian;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     my $U = rand;
     my $V = rand;
     return $self->{ mean } + (sqrt(-2 * log $U) * cos($two_pi * $V) * $self->{ sigma });
 }
 
-sub Statistics::Distribution::Generator::uniform::_render {
+1;
+
+package Statistics::Distribution::Generator::uniform;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     return ($self->{ max } - $self->{ min }) * rand() + $self->{ min };
 }
 
-sub Statistics::Distribution::Generator::logistic::_render {
+1;
+
+package Statistics::Distribution::Generator::logistic;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     return -log((1 / _rand_nonzero()) - 1);
 }
 
-sub Statistics::Distribution::Generator::supplied::_render {
+1;
+
+package Statistics::Distribution::Generator::supplied;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     return $self->{ code }->();
 }
 
-sub Statistics::Distribution::Generator::gamma::_render {
+1;
+
+package Statistics::Distribution::Generator::gamma;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     my $rv;
     if ($self->{ order } == $self->{ norder }) {
@@ -215,7 +290,22 @@ sub Statistics::Distribution::Generator::gamma::_render {
     return $rv;
 }
 
-sub Statistics::Distribution::Generator::exponential::_render {
+1;
+
+package Statistics::Distribution::Generator::exponential;
+
+use 5.018;
+use utf8;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
     my $self = shift;
     my $rv = -log(rand) / $self->{ lambda };
 }
