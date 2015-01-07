@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use Statistics::Descriptive;
 use Statistics::Distribution::Generator qw( :all );
@@ -38,3 +38,30 @@ diag('Set $ENV{ SDG_ACC } to control the desired accuracy of each sanity test') 
         && $s->mean < (0.5 + $accuracy)
     );
 }
+
+{
+    my $coinA = supplied(0) | supplied(1);
+    my $coinB = supplied(0) | supplied(1);
+    my $twocoins = $coinA x $coinB;
+    my $s = Statistics::Descriptive::Sparse->new();
+    for (1 .. $num_tests) {
+        $s->add_data($_) for @$twocoins;
+    }
+    ok(
+        $s->mean > (0.5 - $accuracy)
+        && $s->mean < (0.5 + $accuracy)
+    );
+}
+
+{
+    my $d3 = supplied(1) | supplied(2) | supplied(3);
+    my $s = Statistics::Descriptive::Sparse->new();
+    for (1 .. $num_tests) {
+        $s->add_data($d3);
+    }
+    ok(
+        $s->mean > (2 - $accuracy)
+        && $s->mean < (2 + $accuracy)
+    );
+}
+

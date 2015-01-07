@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Tabluate
 
+0.008   2015-01-07
+        Adding more sanity tests.
+
 0.007   2015-01-07
         Start thinking about sanity tests.
 
@@ -20,4 +23,3 @@ Revision history for Data-Dumper-Tabluate
 
 0.001   2015-01-06
         First version, released on an unsuspecting world.
-
