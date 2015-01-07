@@ -19,7 +19,7 @@ $VERSION = '0.006';
 sub logistic ();
 
 our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
-our %EXPORT_TAGS = (':all' => \@EXPORT_OK);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our $pi = 3.14159265358979323846264338327950288419716939937510;
 our $two_pi = 2 * $pi;

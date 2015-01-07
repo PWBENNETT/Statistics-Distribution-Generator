@@ -15,6 +15,7 @@ WriteMakefile(
         'List::AllUtils' => '0',
         'Test::More'   => '0',
         'Exporter' => '0',
+        'Statistics::Descriptive' => '0',
     },
     MIN_PERL_VERSION => '5.018000',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
