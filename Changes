@@ -1,5 +1,11 @@
 Revision history for Data-Dumper-Tabluate
 
+0.009   2015-01-09
+        Adding more sanity tests. Had an idea of how to turn any supplied PDF
+        into an RNG, by using the CDF of that PDF, and picking a random y
+        (0 .. 1) and then returning that x that has probability y. Not
+        implemented yet ...
+
 0.008   2015-01-07
         Adding more sanity tests.
 
