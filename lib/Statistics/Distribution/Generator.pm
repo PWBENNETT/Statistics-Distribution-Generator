@@ -15,7 +15,7 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.009';
+$VERSION = '0.010';
 
 sub logistic ();
 
@@ -319,7 +319,7 @@ functions
 
 =head1 VERSION
 
-Version 0.009
+Version 0.010
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use Statistics::Descriptive;
 use Statistics::Distribution::Generator qw( :all );
@@ -75,7 +75,7 @@ diag('Set $ENV{ SDG_ACC } to control the desired accuracy of each sanity test (d
         $s->add_data($unfair_coin);
     }
     ok(
-        $s->mean <= 1 / $heavy->{ weight }
+        $s->mean <= (1 / $heavy->{ weight }) + $accuracy
     );
 }
 
@@ -95,5 +95,18 @@ diag('Set $ENV{ SDG_ACC } to control the desired accuracy of each sanity test (d
         (($z > -1.25 && $z < 1.25) && ($y > -9 && $y < 9) && ($x > -1.25 && $x < 1.25))
         ||
         (($z > -1.25 && $z < 1.25) && ($y > -1.25 && $y < 1.25) && ($x > -9 && $x < 9))
+    );
+}
+
+{
+    # The robot from the POD, inside out, kinda
+    my $move = gaussian(-3, 1) | gaussian(3, 1);
+    my $stationary = gaussian(0, 0.5);
+    $stationary->{ weight } = 4;
+    my $do_something = $move | $stationary;
+    my $direction = $do_something x $do_something x $do_something;
+    my ($z, $y, $x) = @$direction;
+    ok(
+        ($z > -9 && $z < 9) && ($y > -9 && $y < 9) && ($x > -9 && $x < 9)
     );
 }
