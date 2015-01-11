@@ -1,5 +1,7 @@
 package Statistics::Distribution::Generator;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use overload (
@@ -15,7 +17,7 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.010';
+$VERSION = '0.011';
 
 sub logistic ();
 
@@ -180,6 +182,8 @@ sub _add_dimension {
 
 package Statistics::Distribution::Generator::gaussian;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -202,6 +206,8 @@ sub _render {
 
 package Statistics::Distribution::Generator::uniform;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -222,6 +228,8 @@ sub _render {
 
 package Statistics::Distribution::Generator::logistic;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -242,6 +250,8 @@ sub _render {
 
 package Statistics::Distribution::Generator::supplied;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -262,6 +272,8 @@ sub _render {
 
 package Statistics::Distribution::Generator::gamma;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -292,6 +304,8 @@ sub _render {
 
 package Statistics::Distribution::Generator::exponential;
 
+use strict;
+use warnings;
 use 5.018;
 use utf8;
 use base qw( Statistics::Distribution::Generator );
@@ -319,7 +333,7 @@ functions
 
 =head1 VERSION
 
-Version 0.010
+Version 0.011
 
 =head1 SYNOPSIS
 
