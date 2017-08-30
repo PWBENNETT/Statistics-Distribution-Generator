@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Tabluate
 
+0.014   2017-08-30
+        Add the dice() distribution
+
 0.013   2015-01-12
         Kwalitee bump
 

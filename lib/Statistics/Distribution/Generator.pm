@@ -1,9 +1,7 @@
 package Statistics::Distribution::Generator;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
+
 use overload (
     '0+' => '_render',
     '""' => '_render',
@@ -17,11 +15,11 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.013';
+$VERSION = '0.014';
 
 sub logistic ();
 
-our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
+our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential dice );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our $pi = 3.14159265358979323846264338327950288419716939937510;
@@ -95,6 +93,14 @@ sub exponential {
     return bless { lambda => $lambda }, 'Statistics::Distribution::Generator::exponential';
 }
 
+sub dice {
+    my ($numdice, $numsides) = @_;
+    return bless {
+        numdice => $numdice,
+        numsides => $numsides,
+    } => 'Statistics::Distribution::Generator::dice';
+}
+
 sub _rand_nonzero {
     my $rv;
     1 while (!($rv = rand));
@@ -156,7 +162,7 @@ sub _add_alternative {
     $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
     my $self
         = ref($lhs) eq 'Statistics::Distribution::Generator'
-        ? { %$lhs }
+        ? { alts => [ ], %$lhs }
         : { alts => [ $lhs ] }
         ;
     bless $self, 'Statistics::Distribution::Generator';
@@ -170,7 +176,7 @@ sub _add_dimension {
     $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
     my $self
         = ref($lhs) eq 'Statistics::Distribution::Generator'
-        ? { %$lhs }
+        ? { dims => [ ], %$lhs }
         : { dims => [ $lhs ] }
         ;
     bless $self, 'Statistics::Distribution::Generator';
@@ -182,10 +188,7 @@ sub _add_dimension {
 
 package Statistics::Distribution::Generator::gaussian;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -206,10 +209,7 @@ sub _render {
 
 package Statistics::Distribution::Generator::uniform;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -228,10 +228,7 @@ sub _render {
 
 package Statistics::Distribution::Generator::logistic;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -250,10 +247,7 @@ sub _render {
 
 package Statistics::Distribution::Generator::supplied;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -272,10 +266,7 @@ sub _render {
 
 package Statistics::Distribution::Generator::gamma;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -304,10 +295,7 @@ sub _render {
 
 package Statistics::Distribution::Generator::exponential;
 
-use strict;
-use warnings;
 use 5.018;
-use utf8;
 use base qw( Statistics::Distribution::Generator );
 use overload (
     '0+' => '_render',
@@ -324,6 +312,29 @@ sub _render {
 
 1;
 
+package Statistics::Distribution::Generator::dice;
+
+use 5.018;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+    '0+' => '_render',
+    '""' => '_render',
+    '|' => '_add_alternative',
+    'x' => '_add_dimension',
+    fallback => 1,
+);
+
+sub _render {
+    my $self = shift;
+    my $rv;
+    for (1 .. $self->{ numdice }) {
+        $rv += int(1 + rand($self->{ numsides }));
+    }
+    return $rv;
+}
+
+1;
+
 __END__
 
 =head1 NAME
@@ -333,7 +344,7 @@ functions
 
 =head1 VERSION
 
-Version 0.013
+Version 0.014
 
 =head1 SYNOPSIS
 
@@ -439,7 +450,7 @@ returned as is, or a coderef CALLBACK that may use any algorithm you like to
 generate a suitable random number. For now, B<this is the main plugin methodology>
 for this module. The supplied CALLBACK is given no arguments, and B<SHOULD>
 return a numeric answer. If it returns something non-numeric, you are entirely
-on your own in how to interpret that, and you are probably doing it wrongly.
+on your own in how to interpret that, and you are I<probably> doing it wrongly.
 
 =back
 
@@ -468,6 +479,15 @@ exponentially-distributed random variables, each of which has a mean of I<theta>
 The Exponential Distribution function is often useful when modeling /
 simulating the time between events in certain types of system. It is also used
 in reliability theory and the Barometric formula in physics.
+
+=back
+
+=over
+
+=item dice(COUNT, SIDES)
+
+The dice distribution mimics what you'd get when rolling I<COUNT> dice, each 
+with I<SIDES> sides (numbered sequentially starting at 1), and summing the result.
 
 =back
 
@@ -520,19 +540,50 @@ The idea of composing probabilities together is inspired by work done by Sooraj
 Bhat, Ashish Agarwal, Richard Vuduc, and Alexander Gray at Georgia Tech and
 NYU, published around the end of 2011.
 
-The implementation of the Gamma Distribution is by Nigel Wetters Gourlay.
+The implementation of the Gamma Distribution is by L<NWETTERS>.
 
 =head1 CAVEATS
 
 Almost no error checking is done. Garbage in I<will> result in garbage out.
 
-This is B<ALPHA> quality software. Any aspect of it, including the API and core functionality, is likely to change at any time.
+This is B<ALPHA> quality software. Any aspect of it, including the API and core 
+functionality, is likely to change at any time, on my personal whim.
+
+=head1 WISHLIST
+
+If you know statistics and you know how to model distributions not listed 
+herein, you're encouraged to open a CPAN RT ticket describing how to do those
+probability distribution functions.
+
+=head1 ULTRA-WISHLIST
+
+If you know how to take the first I<k> moments (and/or the first I<l> L-moments)
+of a distribution, and reverse engineer it into a generator, please, B<please>
+get in touch via CPAN RT. I am I<painfully> aware that this is something sorely
+missing from this module.
 
 =head1 TODO
 
+=over
+
+=item More PDFs
+
 Build in more probability density functions.
 
-Tests. Lots of very clever tests.
+=item More Tests
+
+Lots of very clever tests. Probably something with L<Data::IEEE754::Tools> 
+and more use of L<Statistics::Descriptive>.
+
+=item Give it some Acme?
+
+Enhance the C<dice()> distribution to take the same args as L<Acme::Dice>?
+
+=item Older Perls?
+
+Why do we need 5.018? Investigate.
+
+=back
 
 =head1 LICENSE
 
