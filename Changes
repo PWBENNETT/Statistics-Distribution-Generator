@@ -1,4 +1,9 @@
-Revision history for Data-Dumper-Tabluate
+Revision history for Statistics-Distribution-Generator
+
+1.000   2017-08-30
+        From here on out, API changes will be backwards-compatible to the 
+        maximum extent allowable, though this does not guarantee the interals
+        will stay as they are.
 
 0.014   2017-08-30
         Add the dice() distribution

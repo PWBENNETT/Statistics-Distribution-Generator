@@ -15,7 +15,7 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.014';
+$VERSION = '1.000';
 
 sub logistic ();
 
@@ -344,7 +344,7 @@ functions
 
 =head1 VERSION
 
-Version 0.014
+Version 1.000
 
 =head1 SYNOPSIS
 
@@ -546,8 +546,9 @@ The implementation of the Gamma Distribution is by L<NWETTERS>.
 
 Almost no error checking is done. Garbage in I<will> result in garbage out.
 
-This is B<ALPHA> quality software. Any aspect of it, including the API and core 
-functionality, is likely to change at any time, on my personal whim.
+Although this has finally reached a version Z<>>= 1.x, and I will keep the API
+as backwards-compatible as possible, be aware that the internals I<are> still
+open for change, and subsequent changes I<may> introduce regression failures.
 
 =head1 WISHLIST
 
