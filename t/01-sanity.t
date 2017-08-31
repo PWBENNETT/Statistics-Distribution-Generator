@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 8;
+use lib '.';
 
 use Statistics::Descriptive;
 use Statistics::Distribution::Generator qw( :all );
