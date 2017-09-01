@@ -2,6 +2,13 @@ package Statistics::Distribution::Generator;
 
 use 5.010;
 
+BEGIN {
+  if ($] lt '5.012') {
+    use strict;
+    use warnings;
+  }
+}
+
 use overload (
   '0+' => '_render',
   '""' => '_render',
@@ -15,7 +22,7 @@ use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '1.001';
+$VERSION = '1.003';
 
 sub logistic ();
 
@@ -350,7 +357,7 @@ functions
 
 =head1 VERSION
 
-Version 1.001
+Version 1.003
 
 =head1 SYNOPSIS
 
@@ -360,6 +367,15 @@ Version 1.001
   my $cloud = gaussian(0, 1) x gaussian(0, 1) x gaussian(0, 1);
   say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 2, +/- 2, +/- 2)
   my $combo = gaussian(100, 15) | uniform(0, 200); # one answer with an equal chance of being picked from either distribution
+
+=head1 A NOTE ON TEST FAILURES
+
+The test suite for this module is imperfect, precisely because it's hard to 
+predict what random numbers will do, so you may run into unrepeatable test 
+"failures" that are merely the result of something very unlikely happening, 
+rather than something being broken. I can only recommend retrying the test
+suite / installation process, though if it takes more than a couple of tries,
+you've probably found a real bug, which should be reported through CPAN RT.
 
 =head1 DESCRIPTION
 
@@ -415,7 +431,7 @@ other available reference site / material.
 
 Gaussian Normal Distribution. This is the classic "bell curve" shape. Numbers
 close to the MEAN are more likely to be selected, and the value of SIGMA is
-used to determine how unlikely more-distant values are. For instance, about 2/3
+used to determine how likely more-distant values are. For instance, about 2/3
 of the "answers" will be in the range (MEAN - SIGMA) Z<><= N Z<><= (MEAN +
 SIGMA), and around 99.5% of the "answers" will be in the range (MEAN - 3 * SIGMA)
 Z<><= N Z<><= (MEAN + 3 * SIGMA). "Answers" as far away as 6 * SIGMA are

@@ -1,7 +1,14 @@
 Revision history for Statistics-Distribution-Generator
 
+1.003   2017-09-01
+        More tweaks to Makefile.PL for Kwalitee
+
+1.002   2017-09-01
+        A note regarding spurious test failures being inevitable. Some tweaks
+        to Makefile.PL and the way some Author Tests are done.
+
 1.001   2017-08-31
-        Give NWATTERS proper props. Refactor some stuff. Fix whitespace.
+        Give NWETTERS proper props. Refactor some stuff. Fix whitespace.
         Fix ancient bug where using more than one "x" or "|" in a row might
         silently fail.
 

@@ -5,5 +5,6 @@ Makefile.PL
 README
 lib/Statistics/Distribution/Generator.pm
 t/00-load.t
+t/01-sanity.t
 t/pod-coverage.t
 t/pod.t
